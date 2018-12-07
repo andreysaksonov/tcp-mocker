@@ -4,6 +4,11 @@
 
 `./mvnw clean package`
 
+
+### Build using Docker
+
+`docker-compose up`
+
 ### Usage
 
 ##### Maven:
@@ -11,7 +16,7 @@
 ```
 <dependency>
     <groupId>io.payworks.labs.tcpmocker</groupId>
-    <artifactId>tcp-mocker-all</artifactId>
+    <artifactId>tcp-mocker-service</artifactId>
     <version>LOCAL-SNAPSHOT</version>
 </dependency>
 ```
@@ -32,7 +37,7 @@ serverFactory.createTcpServer(10001);
 ```
 docker run -it --rm \
   -p 10001:10001 \
-  -v ./tcp-mappings:/var/lib/tcp-mocker/tcp-mappings \
+  -v $(pwd)/tcp-mappings:/var/lib/tcp-mocker/tcp-mappings \
   tcp-mocker-app:LOCAL-SNAPSHOT
 ```
 
@@ -47,7 +52,7 @@ mvn -N io.takari:maven:wrapper -Dmaven=3.6.0
 
     $ docker run -it --rm \
         -p 10001:10001 \
-        -v ./tcp-mocker-app/test/resources/tcp-mappings:/var/lib/tcp-mocker/tcp-mappings \
+        -v $(pwd)/tcp-mocker-app-test/tcp-mocker-app/tcp-mappings:/var/lib/tcp-mocker/tcp-mappings \
         tcp-mocker-app:LOCAL-SNAPSHOT
 
     $ echo -ne 'ping' | xxd -p
@@ -56,5 +61,8 @@ mvn -N io.takari:maven:wrapper -Dmaven=3.6.0
     $ echo -ne '\x70\x69\x6e\x67' | xxd -p
     70696e67
     
-    $ echo -ne '\x70\x69\x6e\x67' | nc localhost 10001
+    $ echo -ne '\x70\x69\x6e\x67' | ncat localhost 10001
     pong
+
+    $ echo -ne '\x70\x69\x6e\x67' | ncat localhost 10001 | xxd -p
+    706f6e67
