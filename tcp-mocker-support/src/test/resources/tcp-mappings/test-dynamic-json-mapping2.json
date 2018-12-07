@@ -1,0 +1,9 @@
+{
+  "handlerType": "DYNAMIC_HEX_REGEX",
+  "request": {
+    "matches": "0200(\\d{10})4F2F0F90(0{4})30"
+  },
+  "response": {
+    "data": "{0}42FA{1}"
+  }
+}

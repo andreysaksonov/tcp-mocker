@@ -1,0 +1,8 @@
+version: "2"
+services:
+  tcp-mocker-app:
+    image: tcp-mocker-app:${TCP_MOCKER_APP_VERSION}
+    environment:
+      - LOGGING_LEVEL_IO_PAYWORKS_LABS_TCPMOCKER=TRACE
+    volumes:
+      - ./tcp-mappings:/var/lib/tcp-mocker/tcp-mappings

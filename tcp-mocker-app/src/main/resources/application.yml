@@ -1,0 +1,13 @@
+mockserver:
+  port: 10001
+  tcp-mappings-path: file:${user.home}/.tcp-mocker/tcp-mappings
+
+# Enabling H2 Console
+spring:
+  jpa:
+    open-in-view: false
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true

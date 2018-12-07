@@ -1,0 +1,9 @@
+mockserver:
+  port: 10001
+  tcp-mappings-path: classpath:/tcp-mappings/
+
+logging:
+  level:
+    org:
+      springframework:
+        web: INFO

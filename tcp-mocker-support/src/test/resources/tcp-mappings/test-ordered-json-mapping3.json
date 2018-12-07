@@ -1,0 +1,9 @@
+{
+  "handlerType": "DYNAMIC_HEX_REGEX",
+  "request": {
+    "matches": "\\d{4}AB\\w{2}"
+  },
+  "response": {
+    "data": "02"
+  }
+}

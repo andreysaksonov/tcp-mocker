@@ -1,0 +1,8 @@
+{
+  "request": {
+    "matches": "70696E67.*"
+  },
+  "response": {
+    "data": "706F6E67"
+  }
+}

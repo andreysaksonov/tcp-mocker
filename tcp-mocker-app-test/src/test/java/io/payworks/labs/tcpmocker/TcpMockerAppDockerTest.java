@@ -1,0 +1,60 @@
+package io.payworks.labs.tcpmocker;
+
+import org.testcontainers.containers.DockerComposeContainer;
+import org.testng.annotations.*;
+
+import java.io.File;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
+public class TcpMockerAppDockerTest {
+
+    private static final String TCP_MOCKER_APP_SERVICE_NAME = "tcp-mocker-app";
+
+    private static final int TCP_SERVICE_PORT = 10001;
+    private static final int WEB_SERVICE_PORT = 8080;
+
+    private static final DockerComposeContainer tcpMocker =
+            new DockerComposeContainer(new File("tcp-mocker-app/docker-compose.yml"))
+                    .withExposedService(TCP_MOCKER_APP_SERVICE_NAME, TCP_SERVICE_PORT)
+                    .withExposedService(TCP_MOCKER_APP_SERVICE_NAME, WEB_SERVICE_PORT);
+
+    private SimpleTcpClient tcpClient;
+
+    @BeforeClass
+    public static void startContainer() {
+        tcpMocker.start();
+    }
+
+    @AfterClass
+    public static void stopContainer() {
+        tcpMocker.stop();
+    }
+
+    @BeforeMethod
+    public void setup() throws Exception {
+        tcpClient = new SimpleTcpClient(getTcpServiceHost(), getTcpServicePort());
+    }
+
+    @AfterMethod
+    public void close() throws Exception {
+        tcpClient.close();
+    }
+
+    @Test
+    public void testContainer() throws Exception {
+        final String received = new String(tcpClient.sendAndReceive("ping".getBytes(UTF_8)), UTF_8);
+
+        assertThat(received, equalTo("pong"));
+    }
+
+    private Integer getTcpServicePort() {
+        return tcpMocker.getServicePort(TCP_MOCKER_APP_SERVICE_NAME, TCP_SERVICE_PORT);
+    }
+
+    private String getTcpServiceHost() {
+        return tcpMocker.getServiceHost(TCP_MOCKER_APP_SERVICE_NAME, TCP_SERVICE_PORT);
+    }
+}

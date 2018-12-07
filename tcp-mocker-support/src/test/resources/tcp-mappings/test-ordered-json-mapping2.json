@@ -1,0 +1,8 @@
+{
+  "request": {
+    "matches": "\\d{4}ABCD"
+  },
+  "response": {
+    "data": "01"
+  }
+}
