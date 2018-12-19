@@ -1,2 +1,8 @@
+cache.directories:
+  - $HOME/.mvn/wrapper/
+
 language: java
-jdk: openjdk8
+jdk:
+  - openjdk8
+services:
+  - docker
