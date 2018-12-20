@@ -4,10 +4,12 @@
 
 ### Build
 
+##### Maven
+
 `./mvnw clean package`
 
 
-### Build using Docker
+##### Docker
 
 `docker-compose up`
 
@@ -26,12 +28,15 @@
 ##### Java:
 
 ```
-TcpServerBuilder<? extends TcpServer> serverBuilder = new NettyTcpServerBuilder();
-DataHandlersLoader dataHandlersLoader = new JsonMappingDataHandlersLoader();
+var port = 10001;
 
-TcpServerFactory serverFactory = new TcpServerFactory(serverBuilder, dataHandlersLoader);
+var dataHandlersLoader = new DefaultDataHandlersLoader();
+dataHandlersLoader.setMappingsPath("./tcp-mappings")
 
-serverFactory.createTcpServer(10001);
+var serverBuilder = new NettyTcpServerBuilder();
+var serverFactory = new TcpServerFactory(serverBuilder, dataHandlersLoader);
+
+serverFactory.createTcpServer(port);
 ```
 
 ##### Docker:
@@ -44,13 +49,15 @@ docker run -it --rm \
 ```
 
 
-##### Upgrade Maven:
+### Tips & Tricks
+
+##### Upgrade Maven Version
 
 ```
 mvn -N io.takari:maven:wrapper -Dmaven=3.6.0
 ```
 
-##### Tips & Tricks:
+##### TCP Mocker Application Playground
 
     $ docker run -it --rm \
         -p 10001:10001 \
