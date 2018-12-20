@@ -21,25 +21,27 @@
     </modules>
 
     <scm>
-        <developerConnection>scm:git:git://git@bitbucket.org:payworks/io.payworks.labs.tcpmocker.git</developerConnection>
-        <url>https://bitbucket.org/payworks/io.payworks.labs.tcpmocker</url>
+        <connection>scm:git:git://github.com/payworks/tcp-mocker.git</connection>
+        <developerConnection>scm:git:git@github.com:payworks/tcp-mocker.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/payworks/tcp-mocker</url>
     </scm>
 
     <distributionManagement>
         <repository>
-            <id>payworks-releases</id>
-            <name>gateway</name>
-            <url>https://releases.payworks.io/artifactory/gateway</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-
-        <deploy.skip>true</deploy.skip>
-        <maven.deploy.skip>${deploy.skip}</maven.deploy.skip>
 
         <spring-boot.version>2.0.7.RELEASE</spring-boot.version>
         <springfox.version>2.9.2</springfox.version>
@@ -235,6 +237,20 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>1.6</version>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                            <phase>verify</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.0</version>
                     <configuration>
@@ -287,6 +303,19 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.22.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>2.22.1</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.springframework.boot</groupId>

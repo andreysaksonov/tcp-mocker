@@ -9,7 +9,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class TcpMockerAppDockerTest {
+public class TcpMockerAppDockerIT {
 
     private static final String TCP_MOCKER_APP_SERVICE_NAME = "tcp-mocker-app";
 
