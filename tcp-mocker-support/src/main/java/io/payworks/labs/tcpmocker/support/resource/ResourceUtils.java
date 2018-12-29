@@ -1,6 +1,6 @@
 package io.payworks.labs.tcpmocker.support.resource;
 
-import com.google.common.io.Resources;
+import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -20,8 +20,19 @@ public final class ResourceUtils {
     private ResourceUtils() {
     }
 
+    public static URL toResourceUrl(final Class<?> contextClass, final String path) {
+        try {
+            final String resourceName = path.substring(RESOURCE_SCHEME.length());
+            final ClassLoader context = contextClass == null ? null : contextClass.getClassLoader();
+
+            return IOUtils.resourceToURL(resourceName, context);
+        } catch (final Exception e) {
+            throw asResourceException(e);
+        }
+    }
+
     public static URL toResourceUrl(final String path) {
-        return Resources.getResource(ResourceUtils.class, path.substring(RESOURCE_SCHEME.length()));
+        return toResourceUrl(null, path);
     }
 
     public static Path toFilePath(final String path) {
@@ -32,13 +43,16 @@ public final class ResourceUtils {
         if (dirPath.startsWith(RESOURCE_SCHEME)) {
             try {
                 final URL resourceUrl = toResourceUrl(dirPath);
-                final List<String> lines = Resources.readLines(resourceUrl, StandardCharsets.UTF_8);
 
-                return lines.stream()
-                        .map(entry -> concat(dirPath, entry))
-                        .collect(Collectors.toList());
+                try (final InputStream is = resourceUrl.openStream()) {
+                    final List<String> lines = IOUtils.readLines(is, StandardCharsets.UTF_8);
+
+                    return lines.stream()
+                            .map(entry -> concat(dirPath, entry))
+                            .collect(Collectors.toList());
+                }
             } catch (final Exception e) {
-                throw new ResourceException(e);
+                throw asResourceException(e);
             }
         } else if (dirPath.startsWith(FILE_SCHEME)) {
             final Path filePath = toFilePath(dirPath);
@@ -54,14 +68,14 @@ public final class ResourceUtils {
     public static byte[] toByteArray(final String path) {
         try {
             if (path.startsWith(RESOURCE_SCHEME)) {
-                return Resources.toByteArray(toResourceUrl(path));
+                return IOUtils.toByteArray(toResourceUrl(path));
             } else if (path.startsWith(FILE_SCHEME)) {
                 return Files.readAllBytes(toFilePath(path));
             } else {
                 return Files.readAllBytes(Paths.get(path));
             }
         } catch (final Exception e) {
-            throw new ResourceException(e);
+            throw asResourceException(e);
         }
     }
 
@@ -75,7 +89,7 @@ public final class ResourceUtils {
                 return Files.newInputStream(Paths.get(path));
             }
         } catch (final Exception e) {
-            throw new ResourceException(e);
+            throw asResourceException(e);
         }
     }
 
@@ -100,11 +114,19 @@ public final class ResourceUtils {
                     .map(Path::toString)
                     .collect(Collectors.toList());
         } catch (final Exception e) {
-            throw new ResourceException(e);
+            throw asResourceException(e);
         }
     }
 
     private static String pathSeparator() {
         return "/";
+    }
+
+    private static ResourceException asResourceException(final Exception e) {
+        if (e instanceof ResourceException) {
+            return (ResourceException) e;
+        } else {
+            return new ResourceException(e);
+        }
     }
 }
