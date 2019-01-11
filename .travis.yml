@@ -1,10 +1,21 @@
 cache.directories:
-  - $HOME/.mvn/wrapper/
-
+- "$HOME/.mvn/wrapper/"
 language: java
 jdk:
-  - openjdk8
+- openjdk8
 services:
-  - docker
-
-script: ./mvnw -e verify -B
+- docker
+script:
+- export BUILD_BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH;
+  else echo $TRAVIS_PULL_REQUEST_BRANCH; fi | sed -r s/[\\/:\"\<\>\|?*]/-/g)
+- "./mvnw versions:set -DnewVersion=$BUILD_BRANCH-SNAPSHOT"
+- if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
+  ./mvnw versions:set -DnewVersion=1.0.${TRAVIS_BUILD_NUMBER}.RELEASE; fi
+- "./continuous-deployment/before-deploy.sh"
+- "./mvnw --settings continuous-deployment/mvnsettings.xml -e deploy -B"
+env:
+  global:
+  - secure: YVy+wyRM44E4UjqXmK9IJy7rfDHf2dlFDdxID5L70ANqUoVr35MTOoeatsjeRgIVK6keArlfcay38Bs5vYyNI//m0GA+XunP0cy4+/quIQhWVMshVnlTf4PHxSh/qSgAdSOAEzL21I7gzsHD8GScc+ef+R/qi/6CCtT2Os72o7OPLd+m2F3cuwEQlLYFUVPVMvSpNsK7s9nIoL96aKahPOLt0myOZYFC031YxIdAJZTnGmIyh2iueAAa38iEI4uy7ghYUacpTFx8DlbrsA4tJoZ2AJUcSG81DwI8cCp13e7lzZ4vDQwdG6pV7G93FWJsmS2oOcLzL46BJHSrH2ZLXMSCkoeqTZ8KsANPIiOqvUvuB3Xbx8SV2HiodreDsan19t2ajTp1Xcp23kASvQVJWCzlBwzpeioy7TqLpUpKggcyrnRn0rQIdsXApYTtxB/YroNIeQtDGSbUOzxS57hi2rEr3v/fVi5nHZnpsi6fwE5gJa/nHBGQeAxFC47RMGU2hmWA0CgE1CG8BGPmIp03G4GOcn9/76s/XNzU0UP5O4gFWY+XKgPxq66xs/cApFR5iVImoHYlocf/WYC64ov5AUuXtDEBGXoSUvbIdgVJab2ZwmauZ088VQPlHF5PFOleJPi+g1O0OxAB8M6JmJIlKBjmTqCcSZcZdiO6iryXwVY=
+  - secure: Df2oKxSi6Zzy29CBgp0Ewre6jwR2V1MG1n0ZjM1ZaKZouE1GXkiake/7fewLwr4PETDMk0spfHGqHHYb6NTDTHJon2MmwE9/YJ2ngIWmDbIfepefT2Pyk0qr7ejtWu9zhL6jjpbmxJslLctMfPjLorwedPJN1LJ55wA9MiIhhnIKRBTbGJk9OThFkDBZT1MESCvzdUJe5YCZ0b/3hAwkw5LqtWpMHVE2HnWS31UOYosUqnOjHo/WC7c0DrUdHzt7EtdEDzRQpAOEVvubW2zuj5S1TVbFJkOZF5rtTHog9D2NccFt5bPwt7dmnngR0RXC09clgcEtyxI2ATu1jRy93I1Lo7NwlEGH+GWE/y2ZE+SN9cvGRGpvkP7uxk2gz5pD3vvTF6l7FAatrgsv03SyCk10ivJCWAtJjafF3Vs2AhxcbXoDPXVjnCwcg9mNd4WvATvWMtYQPvpS1b6rBLSMPakgTkQ1qU85YNVGvASFVlrI6RKxh3aorfO0IMXIiOBNy6jweiun1p7xahPsSS1uxP60f/RRuSVfkFnpieNTleAkb2hnwqWC4cIeqpZ6gu4Jg4XvXxMf7fuhUCVoqT0v7/GQQcS98rqBoXs8RXAmhD3l+ZOgsvyS/nkhdFkMQlFvhLcB6XtcUOLI+00KE/CCDMHXox+lQ2TXRQve9cwpqQA=
+  - secure: ie5dZSmKHZQM4MLlrouIi+XsWOzYRhIltLEhj05bJ+zA80GImmJticxtblz3f2HdY4wvXIL/5KQyYjuqCwd1a8F5tRfPFdiW9D8YD/XdguNg+04B4TulSV1y9CR/jeoK9kV7zEifzxo4S7km1zv4HMP93DuW8njuhZnsQhFWjfxxwxeCLNZ7kKP/OyoLfu5p+Xo7oGzgVVrM5t6bP7f/xTZTS82Jy0+0GiTvFb41l6LycrU9IvyHeUt/0k2MnbH1fZgxu4yXB98U1IvoF3qJL2n8yQb7FtL2uPoF5aS7Gb4P8uZoOjlGndduLnQHr77JC4aZPzxAveZ4cWoj2z4YZH4RVN9KSIn77uB5/BdJ6L6UMUNGVW4mUCC+51PgoMIiqMs8H0FsVXCvyY/DkgmBD73N26RA4LKl1VVgyzqZryGDwMrQAjFIWJ7FUywVAaFoBVVzDDr82KnAEpHRZ11We0xqkRfDqef++77lf2UXvOOD1Nb05gkF4Ftj2onhOFlrTlqVQ6cHBdZszYXyJ/dmF/I+6chA8ISvwA3XJ9wx11EK8kRWpYUpg1c0Cs/hl+OuhhVH7lra4x0MmOgDx2hT+tICSadVekKzV+lGi0+m2y4yonn8lAIJDACk+RMQxVlwqmYK9eH0drLxnOiffmx+tJ/IEV5EDfqnmNKrtquRiTY=
+  - secure: i40jJ+zF5RXq5nbQVE6oMzxfKtBivVc0NXUDrBvcyPBBYAU9Prqt/yNF6TtpcD6SGpHB0xDhir5pPi+QNQsfYW0bbooiSyaCg4vtVsjH65brfMKmqqLvWjZXcON0LXGh416SqYReAXAalM4M/1VABVDzzWk+YqHbuHRVf/7KRCcNVL6CcOWxVCl3IwRHQq2Y6CKghLjCfrYO4O3TqT9fLrZIuAF3rQRZ7ZZ7hCzc2FbUrsGcXzXCJgqJnCi2hRBwqAWL1bDCmI27zbNIa1eSTt/RWogGnhbSsoYrbVqMNiQdaiy4/EdFqiz2xc7EkTf/rjrubL0be0Mjo3cRvZC21CorRZ9PBVXCnnLpR4iv0F041HZj3gGoM2emAuuoJqDqUugpQhITD4XWvGLNrXNISZHkXnvkITb7SneZvPy/oXPgDu2Tke2S48yWzsiocE2qvbHw4xy8xXDhLtWFoGf9cFthEVwErNOvM7UpCVNnH7Wrqp0oZo+GAvyHxR63Vbl9V9RZ1znSWrVnyutBTv32QKCIBNqPpA80RLGvHqRCq/VVzntXZcYRMkKfPJbft5haYtqGnlQ3xT3BHICClS1QXy4B829oJbw8BrOUOFaiQZROp51dEMzAFSDFdFtepQ2Af6fHfzbe9byFXVeMI1dFsha1eL0pb809CENWICz8rCo=
