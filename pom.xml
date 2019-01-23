@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.payworks.labs.tcpmocker</groupId>
@@ -54,7 +55,12 @@
             <email>matej.risek@payworks.com</email>
         </developer>
     </developers>
-
+    <scm>
+        <connection>scm:git:git://github.com/payworks/tcp-mocker.git</connection>
+        <developerConnection>scm:git:git@github.com:payworks/tcp-mocker.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/payworks/tcp-mocker</url>
+    </scm>
     <modules>
         <module>tcp-mocker-app</module>
         <module>tcp-mocker-app-test</module>
@@ -66,13 +72,6 @@
         <module>tcp-mocker-interface</module>
         <module>tcp-mocker-service</module>
     </modules>
-
-    <scm>
-        <connection>scm:git:git://github.com/payworks/tcp-mocker.git</connection>
-        <developerConnection>scm:git:git@github.com:payworks/tcp-mocker.git</developerConnection>
-        <tag>HEAD</tag>
-        <url>https://github.com/payworks/tcp-mocker</url>
-    </scm>
 
     <distributionManagement>
         <repository>
@@ -89,6 +88,7 @@
         <!-- Maven -->
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.deploy.skip>true</maven.deploy.skip>
 
         <!-- Project -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -390,18 +390,20 @@
                     <artifactId>dockerfile-maven-plugin</artifactId>
                     <version>${spotify-dockerfile-maven-plugin.version}</version>
                     <configuration>
-                        <repository>${project.artifactId}</repository>
+                        <repository>tcpmocker/${project.artifactId}</repository>
+                        <skipPush>${maven.deploy.skip}</skipPush>
                         <tag>${project.version}</tag>
                         <buildArgs>
                             <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
                         </buildArgs>
+                        <googleContainerRegistryEnabled>false</googleContainerRegistryEnabled>
                     </configuration>
                     <executions>
                         <execution>
                             <id>default</id>
                             <goals>
                                 <goal>build</goal>
-                                <!--<goal>push</goal>-->
+                                <goal>push</goal>
                             </goals>
                         </execution>
                     </executions>

@@ -36,15 +36,17 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <!-- Disabled as Travis docker fails to run the container and it is not related to this change -->
-    <!--
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <environmentVariables>
+                        <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
+                    </environmentVariables>
+                </configuration>
             </plugin>
         </plugins>
     </build>
-    -->
 </project>
