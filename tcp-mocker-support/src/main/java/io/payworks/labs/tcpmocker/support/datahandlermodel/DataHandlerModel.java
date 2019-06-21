@@ -1,15 +1,16 @@
 package io.payworks.labs.tcpmocker.support.datahandlermodel;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import io.payworks.labs.tcpmocker.datahandler.DataHandlerType;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class DataHandlerModel {
 
@@ -22,6 +23,7 @@ public class DataHandlerModel {
         }
 
         @JsonProperty("matches")
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
         public List<String> getMatchesList() {
             return ImmutableList.copyOf(matchesList);
         }
@@ -61,6 +63,7 @@ public class DataHandlerModel {
         }
 
         @JsonProperty("data")
+        @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
         public List<String> getDataList() {
             return ImmutableList.copyOf(dataList);
         }
@@ -93,17 +96,17 @@ public class DataHandlerModel {
 
     private DataHandlerType handlerType;
     private Integer order;
-    private Request request;
+    private List<Request> requestList;
     private Response response;
 
     @JsonCreator
     public DataHandlerModel(@JsonProperty("handlerType") DataHandlerType handlerType,
                             @JsonProperty("order") Integer order,
-                            @JsonProperty("request") Request request,
+                            @JsonProperty("request") List<Request> requestList,
                             @JsonProperty("response") Response response) {
         this.handlerType = handlerType;
         this.order = order;
-        this.request = request;
+        this.requestList = requestList;
         this.response = response;
     }
 
@@ -118,8 +121,14 @@ public class DataHandlerModel {
     }
 
     @JsonProperty("request")
+    @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+    public List<Request> getRequestList() {
+        return ImmutableList.copyOf(requestList);
+    }
+
+    @JsonIgnore
     public Request getRequest() {
-        return request;
+        return Iterables.getFirst(requestList, null);
     }
 
     @JsonProperty("response")
@@ -134,13 +143,13 @@ public class DataHandlerModel {
         DataHandlerModel that = (DataHandlerModel) o;
         return handlerType == that.handlerType &&
                 Objects.equals(order, that.order) &&
-                Objects.equals(request, that.request) &&
+                Objects.equals(requestList, that.requestList) &&
                 Objects.equals(response, that.response);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(handlerType, order, request, response);
+        return Objects.hash(handlerType, order, requestList, response);
     }
 
     @Override
@@ -148,7 +157,7 @@ public class DataHandlerModel {
         return MoreObjects.toStringHelper(this)
                 .add("handlerType", handlerType)
                 .add("order", order)
-                .add("request", request)
+                .add("requestList", requestList)
                 .add("response", response)
                 .toString();
     }
