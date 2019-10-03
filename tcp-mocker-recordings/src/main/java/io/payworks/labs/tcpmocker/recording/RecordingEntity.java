@@ -1,34 +1,46 @@
 package io.payworks.labs.tcpmocker.recording;
 
-import javax.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Immutable;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
 import java.time.Instant;
 import java.util.Arrays;
 
-@Entity
+@Immutable
+@Table("Recording")
 public class RecordingEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false)
+    @Column
     private Instant timestamp;
 
-    @Column(nullable = false, length = 8192)
+    @Column
     private byte[] request;
 
-    @Column(nullable = false, length = 8192)
+    @Column
     private byte[] reply;
 
-    protected RecordingEntity() {
-        // JPA
+    static RecordingEntity of(final byte[] request,
+                              final byte[] reply) {
+        return new RecordingEntity(null, Instant.now(), request, reply);
     }
 
-    private RecordingEntity(final byte[] request,
-                            final byte[] reply) {
-        this.timestamp = Instant.now();
+    RecordingEntity(final Long id,
+                    final Instant timestamp,
+                    final byte[] request,
+                    final byte[] reply) {
+        this.id = id;
+        this.timestamp = timestamp;
         this.request = request;
         this.reply = reply;
+    }
+
+    RecordingEntity withId(Long id) {
+        return new RecordingEntity(id, this.timestamp, this.request, this.reply);
     }
 
     public Long getId() {
@@ -79,7 +91,7 @@ public class RecordingEntity {
         }
 
         public RecordingEntity build() {
-            final RecordingEntity recordingEntity = new RecordingEntity(request, reply);
+            final RecordingEntity recordingEntity = RecordingEntity.of(request, reply);
 
             this.request = null;
             this.reply = null;

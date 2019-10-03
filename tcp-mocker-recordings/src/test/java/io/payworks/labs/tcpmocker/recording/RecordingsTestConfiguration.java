@@ -2,10 +2,10 @@ package io.payworks.labs.tcpmocker.recording;
 
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 @EntityScan(basePackageClasses = RecordingEntity.class)
-@EnableJpaRepositories(basePackageClasses = RecordingsRepository.class)
+@EnableJdbcRepositories(basePackageClasses = RecordingsRepository.class)
 @SpringBootConfiguration
 public class RecordingsTestConfiguration {
 }
