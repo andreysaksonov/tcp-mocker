@@ -7,12 +7,8 @@
 ### Build
 
 ###### Supported Java Versions:
-* Java 11
-
-```
-Java 12 - Not Supported Yet
-    https://github.com/google/error-prone/pull/1107
-```
+* [Java 11](https://adoptopenjdk.net/releases.html?variant=openjdk11&jvmVariant=hotspot)
+* Java 12/13/14: https://github.com/google/error-prone/issues/1106
 
 ##### Using Maven
 
@@ -57,5 +53,5 @@ docker run -it --rm \
 ##### Upgrade Maven Wrapper Version
 
 ```
-mvn -N io.takari:maven:wrapper -Dmaven=3.6.1
+mvn -N io.takari:maven:wrapper -Dmaven=3.6.3
 ```
