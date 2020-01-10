@@ -19,10 +19,10 @@ cache:
     - $HOME/.m2
 before_script:
   - |
-    MAVEN_DEPLOY_SKIP="true"
+    SKIP_DEPLOY="true"
     if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
       if [ "$TRAVIS_BRANCH" = 'master' ]; then
-        MAVEN_DEPLOY_SKIP="false"
+        SKIP_DEPLOY="false"
         PROJECT_VERSION="1.0.${TRAVIS_BUILD_NUMBER}.RELEASE"
       else
         PROJECT_VERSION="${TRAVIS_BRANCH}-SNAPSHOT"
@@ -30,15 +30,13 @@ before_script:
     else
       PROJECT_VERSION="${TRAVIS_PULL_REQUEST_BRANCH}-SNAPSHOT"
     fi
-    export MAVEN_DEPLOY_SKIP
+    export SKIP_DEPLOY
     export PROJECT_VERSION=$(echo $PROJECT_VERSION | sed -r s/[\\/:\"\<\>\|?*]/-/g)
-
-  - "./mvnw -e -DnewVersion=${PROJECT_VERSION} versions:set -B -V"
 script:
-  - "./mvnw -e --settings continuous-deployment/mvnsettings.xml -Dmaven.deploy.skip=true install -B -V"
+  - "./mvnw -e --settings continuous-deployment/mvnsettings.xml -DnewVersion=${PROJECT_VERSION} versions:set install -B -V"
 before_deploy:
   - |
-    if [ $MAVEN_DEPLOY_SKIP == "false" ]; then
+    if [ $SKIP_DEPLOY== "false" ]; then
       openssl aes-256-cbc -K $encrypted_a3a4db86818a_key -iv $encrypted_a3a4db86818a_iv \
       -in continuous-deployment/payworks_sign_key.asc.enc -d | gpg --fast-import
       echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
@@ -46,11 +44,11 @@ before_deploy:
 deploy:
   skip_cleanup: true
   provider: script
-  script: "./mvnw -e --settings continuous-deployment/mvnsettings.xml -Dmaven.deploy.skip=false deploy -B -V"
+  script: "./mvnw -e --settings continuous-deployment/mvnsettings.xml -Dmaven.test.skip=true -Dmaven.deploy.skip=false deploy -B -V"
   on:
     repo: payworks/tcp-mocker
     branch: master
-    condition: $MAVEN_DEPLOY_SKIP = false
+    condition: $SKIP_DEPLOY = false
 
 env:
   global:

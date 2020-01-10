@@ -9,7 +9,7 @@
         <version>LOCAL-SNAPSHOT</version>
     </parent>
     <artifactId>tcp-mocker-app-test</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <name>payworks/labs/tcp-mocker/app-test</name>
 
     <dependencies>
