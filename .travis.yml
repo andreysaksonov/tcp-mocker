@@ -21,7 +21,7 @@ before_script:
   - |
     SKIP_DEPLOY="true"
     if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-      if [ "$TRAVIS_BRANCH" = 'master' ]; then
+      if [ "$TRAVIS_BRANCH" == "master" ]; then
         SKIP_DEPLOY="false"
         PROJECT_VERSION="1.0.${TRAVIS_BUILD_NUMBER}.RELEASE"
       else
