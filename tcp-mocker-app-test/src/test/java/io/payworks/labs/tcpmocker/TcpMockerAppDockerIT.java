@@ -35,7 +35,6 @@ public class TcpMockerAppDockerIT {
                     .withEnv("TCP_MOCKER_APP_TAG", dockerTcpMockerAppContainerTag)
                     .withLocalCompose(true)
                     .withPull(false)
-                    .withTailChildContainers(true)
                     .withLogConsumer(TCP_MOCKER_APP_SERVICE_NAME, new Slf4jLogConsumer(dockerTcpMockerAppLogger))
                     ;
 
