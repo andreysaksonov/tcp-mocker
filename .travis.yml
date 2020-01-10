@@ -19,7 +19,7 @@ cache:
     - $HOME/.m2
 before_script:
   - |
-    if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+    if [ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" = 'master' ]; then
       echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
     fi
 
