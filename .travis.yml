@@ -44,6 +44,7 @@ before_deploy:
       echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
     fi
 deploy:
+  skip_cleanup: true
   provider: script
   script: "./mvnw -e --settings continuous-deployment/mvnsettings.xml -Dmaven.deploy.skip=false deploy -B -V"
   on:
