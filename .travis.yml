@@ -1,14 +1,22 @@
-cache:
-  directories:
-    - .mvn/wrapper
-    - $HOME/.m2
+os:
+  - linux
+sudo: required
 language: java
 jdk:
   - openjdk11
 services:
   - docker
+before_install:
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo rm /usr/local/bin/docker-compose
+  - sudo mv docker-compose /usr/local/bin
 install:
   - "./mvnw -e de.qaware.maven:go-offline-maven-plugin:resolve-dependencies -B -V"
+cache:
+  directories:
+    - .mvn/wrapper
+    - $HOME/.m2
 before_script:
   - |
     if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
@@ -38,10 +46,13 @@ before_script:
     fi
 script:
   - "./mvnw -e --settings continuous-deployment/mvnsettings.xml -Dmaven.deploy.skip=true install -B -V"
-  - "./mvnw -e --settings continuous-deployment/mvnsettings.xml -Dmaven.deploy.skip=${MAVEN_DEPLOY_SKIP} deploy -B -V"
+deploy:
+  provider: script
+  script: "./mvnw -e --settings continuous-deployment/mvnsettings.xml -Dmaven.deploy.skip=${MAVEN_DEPLOY_SKIP} deploy -B -V"
 
 env:
   global:
+    - DOCKER_COMPOSE_VERSION=1.24.1
     - TESTCONTAINERS_RYUK_DISABLED=true
     - secure: "YVy+wyRM44E4UjqXmK9IJy7rfDHf2dlFDdxID5L70ANqUoVr35MTOoeatsjeRgIVK6keArlfcay38Bs5vYyNI//m0GA+XunP0cy4+/quIQhWVMshVnlTf4PHxSh/qSgAdSOAEzL21I7gzsHD8GScc+ef+R/qi/6CCtT2Os72o7OPLd+m2F3cuwEQlLYFUVPVMvSpNsK7s9nIoL96aKahPOLt0myOZYFC031YxIdAJZTnGmIyh2iueAAa38iEI4uy7ghYUacpTFx8DlbrsA4tJoZ2AJUcSG81DwI8cCp13e7lzZ4vDQwdG6pV7G93FWJsmS2oOcLzL46BJHSrH2ZLXMSCkoeqTZ8KsANPIiOqvUvuB3Xbx8SV2HiodreDsan19t2ajTp1Xcp23kASvQVJWCzlBwzpeioy7TqLpUpKggcyrnRn0rQIdsXApYTtxB/YroNIeQtDGSbUOzxS57hi2rEr3v/fVi5nHZnpsi6fwE5gJa/nHBGQeAxFC47RMGU2hmWA0CgE1CG8BGPmIp03G4GOcn9/76s/XNzU0UP5O4gFWY+XKgPxq66xs/cApFR5iVImoHYlocf/WYC64ov5AUuXtDEBGXoSUvbIdgVJab2ZwmauZ088VQPlHF5PFOleJPi+g1O0OxAB8M6JmJIlKBjmTqCcSZcZdiO6iryXwVY="
     - secure: "Df2oKxSi6Zzy29CBgp0Ewre6jwR2V1MG1n0ZjM1ZaKZouE1GXkiake/7fewLwr4PETDMk0spfHGqHHYb6NTDTHJon2MmwE9/YJ2ngIWmDbIfepefT2Pyk0qr7ejtWu9zhL6jjpbmxJslLctMfPjLorwedPJN1LJ55wA9MiIhhnIKRBTbGJk9OThFkDBZT1MESCvzdUJe5YCZ0b/3hAwkw5LqtWpMHVE2HnWS31UOYosUqnOjHo/WC7c0DrUdHzt7EtdEDzRQpAOEVvubW2zuj5S1TVbFJkOZF5rtTHog9D2NccFt5bPwt7dmnngR0RXC09clgcEtyxI2ATu1jRy93I1Lo7NwlEGH+GWE/y2ZE+SN9cvGRGpvkP7uxk2gz5pD3vvTF6l7FAatrgsv03SyCk10ivJCWAtJjafF3Vs2AhxcbXoDPXVjnCwcg9mNd4WvATvWMtYQPvpS1b6rBLSMPakgTkQ1qU85YNVGvASFVlrI6RKxh3aorfO0IMXIiOBNy6jweiun1p7xahPsSS1uxP60f/RRuSVfkFnpieNTleAkb2hnwqWC4cIeqpZ6gu4Jg4XvXxMf7fuhUCVoqT0v7/GQQcS98rqBoXs8RXAmhD3l+ZOgsvyS/nkhdFkMQlFvhLcB6XtcUOLI+00KE/CCDMHXox+lQ2TXRQve9cwpqQA="
