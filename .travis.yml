@@ -49,6 +49,11 @@ script:
 deploy:
   provider: script
   script: "./mvnw -e --settings continuous-deployment/mvnsettings.xml -Dmaven.deploy.skip=${MAVEN_DEPLOY_SKIP} deploy -B -V"
+  on:
+    repo: payworks/tcp-mocker
+    branches:
+      only:
+        - master
 
 env:
   global:
