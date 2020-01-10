@@ -1,7 +1,10 @@
 package io.payworks.labs.tcpmocker;
 
 import io.payworks.labs.tcpmocker.test.tcpclient.SimpleTcpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.DockerComposeContainer;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testng.annotations.*;
 
 import java.io.File;
@@ -13,32 +16,38 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class TcpMockerAppDockerIT {
 
+    private static final Logger logger = LoggerFactory.getLogger(TcpMockerAppDockerIT.class);
+
     private static final String TCP_MOCKER_APP_SERVICE_NAME = "tcp-mocker-app";
 
     private static final int TCP_SERVICE_PORT = 10001;
     private static final int WEB_SERVICE_PORT = 8080;
 
-    private static final String TCP_MOCKER_APP_CONTAINER_TAG = Optional.ofNullable(System.getenv("PROJECT_VERSION"))
+    private static final String dockerTcpMockerAppContainerTag = Optional.ofNullable(System.getenv("PROJECT_VERSION"))
             .orElse("LOCAL-SNAPSHOT");
 
-    private static final DockerComposeContainer tcpMockerContainer =
-            new DockerComposeContainer(new File("tcp-mocker-app/docker-compose.yml"))
+    private static final Logger dockerTcpMockerAppLogger = LoggerFactory.getLogger(TCP_MOCKER_APP_SERVICE_NAME);
+
+    private static final DockerComposeContainer<?> tcpMockerAppDockerCompose =
+            new DockerComposeContainer<>(new File("tcp-mocker-app/docker-compose.yml"))
                     .withExposedService(TCP_MOCKER_APP_SERVICE_NAME, TCP_SERVICE_PORT)
                     .withExposedService(TCP_MOCKER_APP_SERVICE_NAME, WEB_SERVICE_PORT)
-                    .withEnv("TCP_MOCKER_APP_TAG", TCP_MOCKER_APP_CONTAINER_TAG)
+                    .withEnv("TCP_MOCKER_APP_TAG", dockerTcpMockerAppContainerTag)
                     .withLocalCompose(true)
-                    .withPull(false);
+                    .withPull(false)
+                    .withLogConsumer(TCP_MOCKER_APP_SERVICE_NAME, new Slf4jLogConsumer(dockerTcpMockerAppLogger))
+                    ;
 
     private SimpleTcpClient tcpClient;
 
     @BeforeClass
     public static void startContainer() {
-        tcpMockerContainer.start();
+        tcpMockerAppDockerCompose.start();
     }
 
     @AfterClass
     public static void stopContainer() {
-        tcpMockerContainer.stop();
+        tcpMockerAppDockerCompose.stop();
     }
 
     @BeforeMethod
@@ -52,17 +61,25 @@ public class TcpMockerAppDockerIT {
     }
 
     @Test
-    public void testContainer() throws Exception {
-        final String received = new String(tcpClient.sendAndReceive("ping".getBytes(UTF_8)), UTF_8);
+    public void testTcpMockerApp() throws Exception {
+        final String requestPayload = "ping";
+        final byte[] requestBytes = requestPayload.getBytes(UTF_8);
 
-        assertThat(received, equalTo("pong"));
+        final byte[] receivedBytes = tcpClient.sendAndReceive(requestBytes);
+        final String receivedPayload = new String(receivedBytes, UTF_8);
+
+        logger.info("Request Payload: '{}'", requestPayload);
+        logger.info("Received Payload: '{}'", receivedPayload);
+
+        final String expectedPayload = "pong";
+        assertThat(receivedPayload, equalTo(expectedPayload));
     }
 
     private static Integer getTcpServicePort() {
-        return tcpMockerContainer.getServicePort(TCP_MOCKER_APP_SERVICE_NAME, TCP_SERVICE_PORT);
+        return tcpMockerAppDockerCompose.getServicePort(TCP_MOCKER_APP_SERVICE_NAME, TCP_SERVICE_PORT);
     }
 
     private static String getTcpServiceHost() {
-        return tcpMockerContainer.getServiceHost(TCP_MOCKER_APP_SERVICE_NAME, TCP_SERVICE_PORT);
+        return tcpMockerAppDockerCompose.getServiceHost(TCP_MOCKER_APP_SERVICE_NAME, TCP_SERVICE_PORT);
     }
 }
