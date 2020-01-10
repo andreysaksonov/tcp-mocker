@@ -17,25 +17,26 @@ import static org.hamcrest.Matchers.equalTo;
 public class TcpMockerAppDockerIT {
 
     private static final Logger logger = LoggerFactory.getLogger(TcpMockerAppDockerIT.class);
-    private static final Logger dockerTcpMockerAppLogger = LoggerFactory.getLogger("tcp-mocker-app");
 
     private static final String TCP_MOCKER_APP_SERVICE_NAME = "tcp-mocker-app";
 
     private static final int TCP_SERVICE_PORT = 10001;
     private static final int WEB_SERVICE_PORT = 8080;
 
-    private static final String TCP_MOCKER_APP_CONTAINER_TAG = Optional.ofNullable(System.getenv("PROJECT_VERSION"))
+    private static final String dockerTcpMockerAppContainerTag = Optional.ofNullable(System.getenv("PROJECT_VERSION"))
             .orElse("LOCAL-SNAPSHOT");
+
+    private static final Logger dockerTcpMockerAppLogger = LoggerFactory.getLogger(TCP_MOCKER_APP_SERVICE_NAME);
 
     private static final DockerComposeContainer<?> tcpMockerAppDockerCompose =
             new DockerComposeContainer<>(new File("tcp-mocker-app/docker-compose.yml"))
                     .withExposedService(TCP_MOCKER_APP_SERVICE_NAME, TCP_SERVICE_PORT)
                     .withExposedService(TCP_MOCKER_APP_SERVICE_NAME, WEB_SERVICE_PORT)
-                    .withEnv("TCP_MOCKER_APP_TAG", TCP_MOCKER_APP_CONTAINER_TAG)
+                    .withEnv("TCP_MOCKER_APP_TAG", dockerTcpMockerAppContainerTag)
                     .withLocalCompose(true)
                     .withPull(false)
                     .withTailChildContainers(true)
-                    .withLogConsumer("tcp-mocker-app", new Slf4jLogConsumer(dockerTcpMockerAppLogger))
+                    .withLogConsumer(TCP_MOCKER_APP_SERVICE_NAME, new Slf4jLogConsumer(dockerTcpMockerAppLogger))
                     ;
 
     private SimpleTcpClient tcpClient;
@@ -67,6 +68,9 @@ public class TcpMockerAppDockerIT {
 
         final byte[] receivedBytes = tcpClient.sendAndReceive(requestBytes);
         final String receivedPayload = new String(receivedBytes, UTF_8);
+
+        logger.info("Request Payload: '{}'", requestPayload);
+        logger.info("Received Payload: '{}'", receivedPayload);
 
         final String expectedPayload = "pong";
         assertThat(receivedPayload, equalTo(expectedPayload));
