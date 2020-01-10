@@ -102,7 +102,7 @@
         <apache-commons.version>3.9</apache-commons.version>
         <commons-io.version>2.6</commons-io.version>
         <groovy.version>2.5.8</groovy.version>
-        <testcontainers.version>1.12.4</testcontainers.version>
+        <testcontainers.version>1.11.4</testcontainers.version>
 
         <!-- Plugins -->
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
