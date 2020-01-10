@@ -1,7 +1,10 @@
 package io.payworks.labs.tcpmocker;
 
 import io.payworks.labs.tcpmocker.test.tcpclient.SimpleTcpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.DockerComposeContainer;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testng.annotations.*;
 
 import java.io.File;
@@ -12,6 +15,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 public class TcpMockerAppDockerIT {
+
+    private static final Logger logger = LoggerFactory.getLogger(TcpMockerAppDockerIT.class);
+    private static final Logger dockerTcpMockerAppLogger = LoggerFactory.getLogger("tcp-mocker-app");
 
     private static final String TCP_MOCKER_APP_SERVICE_NAME = "tcp-mocker-app";
 
@@ -27,7 +33,10 @@ public class TcpMockerAppDockerIT {
                     .withExposedService(TCP_MOCKER_APP_SERVICE_NAME, WEB_SERVICE_PORT)
                     .withEnv("TCP_MOCKER_APP_TAG", TCP_MOCKER_APP_CONTAINER_TAG)
                     .withLocalCompose(true)
-                    .withPull(false);
+                    .withPull(false)
+                    .withTailChildContainers(true)
+                    .withLogConsumer("tcp-mocker-app", new Slf4jLogConsumer(dockerTcpMockerAppLogger))
+                    ;
 
     private SimpleTcpClient tcpClient;
 
