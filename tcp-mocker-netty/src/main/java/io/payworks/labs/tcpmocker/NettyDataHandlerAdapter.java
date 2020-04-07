@@ -109,7 +109,7 @@ public class NettyDataHandlerAdapter extends ChannelInboundHandlerAdapter {
                         }
                     });
         } else {
-            //writeBufRef.release();
+            writeBufRef.release();
             ctx.close();
         }
     }
